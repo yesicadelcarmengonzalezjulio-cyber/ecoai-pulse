@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ecoai pulse · Monitoreo de PM10 en Juan Mina</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ===== Barra superior ===== -->
+  <header class="topbar">
+    <div class="topbar-in">
+      <div class="brand">
+        <span class="brand-logo" data-ico="leaf" data-size="22"></span>
+        <div class="brand-txt">
+          <b>ecoai pulse</b>
+          <small>MONITOREO AMBIENTAL INTELIGENTE</small>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="live off" id="livePill"><i></i><span id="liveText">Serie histórica · SISAIRE-IDEAM</span></div>
+        <span class="sep"></span>
+        <div class="station-select">
+          <span class="station-static"><span data-ico="pin" data-size="15"></span><span id="stationName">Juan Mina</span></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ===== Hero ===== -->
+    <section class="hero">
+      <div class="hero-txt">
+        <p class="eyebrow">BARRANQUILLA · ESTACIÓN JUAN MINA · PM10</p>
+        <h1>El pulso ambiental,<br><em>en una sola vista.</em></h1>
+        <p class="lead">Registros reales de PM10 de SISAIRE-IDEAM, con pronóstico y detección de cambios atípicos para entender el aire del territorio y decidir a tiempo.</p>
+      </div>
+      <div class="hero-actions">
+        <button class="btn" id="btnRefresh"><span data-ico="refresh" data-size="16"></span>Recargar datos</button>
+        <button class="btn btn-primary" id="btnReport"><span data-ico="download" data-size="16"></span>Descargar reporte</button>
+      </div>
+    </section>
+
+    <!-- ===== Aviso de carga ===== -->
+    <div class="banner" id="banner" hidden>
+      <span data-ico="alert" data-size="16"></span>
+      <span id="bannerText">No se pudo cargar el archivo reporte_sisaire.csv. Verifica que esté junto a index.html.</span>
+      <button id="btnRetry" class="link">Reintentar</button>
+    </div>
+
+    <!-- ===== Tarjetas de estado ===== -->
+    <section class="cards" id="cards" aria-label="Indicadores de PM10"></section>
+
+    <!-- ===== Tendencia + Mapa + Alertas ===== -->
+    <section class="grid-main">
+      <article class="card trend">
+        <div class="trend-head">
+          <div>
+            <h2>Tendencia de PM10</h2>
+            <p class="sub" id="trendSub">Estación Juan Mina · PM10 diario</p>
+          </div>
+          <div class="seg" id="rangeTabs" role="tablist" aria-label="Ventana de tiempo">
+            <button data-d="30">30 d</button>
+            <button data-d="90">90 d</button>
+            <button data-d="365" class="on">1 año</button>
+            <button data-d="0">Todo</button>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chart"></canvas>
+          <div class="tip" id="chartTip" hidden></div>
+        </div>
+        <div class="trend-foot">
+          <span class="mono" id="lastRead">Último registro: --</span>
+          <span class="legend-fc"><i></i>Pronóstico Random Forest</span>
+        </div>
+      </article>
+
+      <div class="side">
+        <section class="card map-card" aria-label="Ubicación de la estación">
+          <canvas id="forest"></canvas>
+          <div class="map-shade"></div>
+          <div class="map-head">
+            <div>
+              <h2>Estación de monitoreo</h2>
+              <p>Juan Mina · Barranquilla, Atlántico</p>
+            </div>
+            <span data-ico="pin" data-size="18"></span>
+          </div>
+          <div id="mapPoints"></div>
+          <div class="map-foot">
+            <span class="mono" id="mapCount">SISAIRE-IDEAM · PM10</span>
+            <span class="legend"><i class="d ok"></i>≤ 45 <i class="d warn"></i>&gt; 45 µg/m³</span>
+          </div>
+        </section>
+
+        <section class="card alerts">
+          <div class="card-head">
+            <div>
+              <h2>Centro de alertas</h2>
+              <p class="sub">Cambios que merecen atención</p>
+            </div>
+            <span class="ico-bad" data-ico="alert" data-size="18"></span>
+          </div>
+          <ul class="alert-list" id="alertList"></ul>
+        </section>
+      </div>
+    </section>
+
+    <!-- ===== IA + Datos ===== -->
+    <section class="grid-bottom">
+      <article class="card ai">
+        <div class="card-head">
+          <div>
+            <h2>Lectura asistida por IA</h2>
+            <p class="sub">Patrones detectados para orientar la acción</p>
+          </div>
+          <span class="ico-green" data-ico="spark" data-size="20"></span>
+        </div>
+        <div id="aiBody" class="ai-body"></div>
+        <p class="mono ai-foot" id="aiFoot"></p>
+      </article>
+
+      <article class="card sim">
+        <div class="card-head">
+          <div>
+            <h2>Datos y validación</h2>
+            <p class="sub">Serie real de SISAIRE-IDEAM · sin datos simulados</p>
+          </div>
+          <span data-ico="radio" data-size="18"></span>
+        </div>
+        <div class="row">
+          <span>Fuente</span>
+          <span class="mono-val" id="dsSource">--</span>
+        </div>
+        <div class="row">
+          <span>Registros</span>
+          <span class="mono-val" id="dsRecords">--</span>
+        </div>
+        <div class="row">
+          <span>Prueba piloto (20 % final)</span>
+          <span class="mono-val" id="dsTest">--</span>
+        </div>
+        <div class="row">
+          <span>Error del pronóstico (MAE · RMSE)</span>
+          <span class="mono-val" id="dsMetrics">--</span>
+        </div>
+        <div class="row row-last">
+          <span>Otro CSV de SISAIRE (opcional)</span>
+          <label class="btn-mini">Cargar CSV
+            <input type="file" id="fileCsv" accept=".csv,.txt,text/csv" hidden>
+          </label>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script src="reporte_sisaire.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
