@@ -23,6 +23,17 @@ La página no usa datos simulados, telemetría ni otras estaciones.
 
 La página también permite cargar otro CSV de SISAIRE con el botón **Cargar CSV** (columnas `Estacion`, `Fecha inicial`, `PM10`).
 
+## Controles interactivos
+
+- **Rango de la gráfica**: 30 d, 90 d, 1 año, Todo. Al pasar el cursor se ve la fecha, el valor, el pronóstico y las anomalías.
+- **Panel «Explorar el modelo»** (abajo a la izquierda, se despliega con un clic):
+  - *Ir al máximo* / *Ir al último*: salta a los episodios de PM10 más altos (marzo de 2022) o al final de la serie.
+  - *Umbral de anomalía |z|*: cambia cuántas lecturas se marcan como anomalías (▲ positivas, ▼ negativas).
+  - *Horizonte del pronóstico*: de 1 a 14 registros.
+  - *Probar el pronóstico en el pasado*: elige una fecha del periodo de prueba y compara el pronóstico con lo que realmente ocurrió.
+  - *Escenario hipotético*: ¿qué proyectaría el modelo si el PM10 fuera X? Se dibuja en morado y se rotula **«no son datos medidos»**; nunca se mezcla con la serie real.
+- **Recargar datos**, **Cargar CSV** y **Descargar reporte** (serie, valor esperado, z, anomalías y pronóstico).
+
 ## Modelo y validación
 
 - **Variable objetivo**: cambio de PM10 entre registros consecutivos (`y[t+1] − y[t]`).
@@ -62,9 +73,13 @@ Anomalías: 2025-11-16 (z −2.54), 2025-12-24 (z +3.29), 2025-12-25 (z −3.82)
 
 ## Declaración de uso de inteligencia artificial
 
-El código de la aplicación (HTML, CSS y JavaScript, incluida la implementación del Random Forest) se desarrolló con ayuda de
-herramientas de inteligencia artificial generativa, y las autoras lo revisaron y probaron. La misma ayuda se usó para calcular las métricas
-y verificar las cifras de los documentos del proyecto.
+Se utilizó Claude (Anthropic), un modelo de lenguaje de inteligencia artificial generativa, en tres actividades:
+
+1. **Software:** arquitectura de la aplicación (HTML, CSS y JavaScript) e implementación del Random Forest, de la línea base de persistencia, de la detección de anomalías y del script `evaluar_pm10.js`.
+2. **Cálculos y verificación:** cálculo de las métricas, elaboración de las figuras y verificación de las cifras del artículo y del informe contra los datos y el código.
+3. **Redacción:** apoyo en la redacción, la organización del texto y la corrección de estilo.
+
+La obtención de los datos en SISAIRE-IDEAM, la selección de la estación y del contaminante, la revisión y prueba del software y la revisión de los resultados fueron realizadas por la autoría del trabajo, que se responsabiliza del contenido. Esta declaración coincide con la del artículo y la del informe.
 
 ## Datos
 
